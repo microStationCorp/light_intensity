@@ -1,0 +1,42 @@
+int zpin = 3;
+int gPin = 8;
+bool rState = false;
+int delayval = 0;
+int master = A1;
+void setup()
+{
+  Serial.begin(9600);
+  pinMode(gPin, OUTPUT);
+  pinMode(master, INPUT);
+  attachInterrupt(digitalPinToInterrupt(zpin), trig_ISR, FALLING);
+}
+
+void loop()
+{
+  int data = analogRead(master);
+  if (data == 0)
+  {
+    rState = false;
+  }
+  else if (data == 1023)
+  {
+    rState = true;
+  }
+  else if (rState == true)
+  {
+    delayval = 4 * data;
+  }
+}
+
+void trig_ISR()
+{
+  if (rState == true)
+  {
+    delayMicroseconds(delayval);
+    digitalWrite(gPin, LOW);
+    delayMicroseconds(1);
+    digitalWrite(gPin, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(gPin, LOW);
+  }
+}
